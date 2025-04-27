@@ -399,6 +399,33 @@ function showVictoryScreen() {
   messageBox.appendChild(closeBtn);
   overlay.appendChild(messageBox);
   document.body.appendChild(overlay);
+
+  highlightPromposal();
+}
+
+function highlightPromposal() {
+  const promStartingPos = 4;
+  activeDir = 'down';
+  
+  // Remove previous highlighting from cells
+  document.querySelectorAll('.cell.selected, .cell.active')
+    .forEach(c => c.classList.remove('selected','active'));
+  
+  // Remove active classes from clues
+  document.querySelectorAll('#across-list li, #down-list li')
+    .forEach(li => li.classList.remove('active', 'highlighted'));
+
+  const promCell = document.querySelector(`input[data-idx='${promStartingPos}']`).parentCell;
+  promCell.classList.add('selected');
+
+  // Highlight all cells in prom
+  const cells = getEntryCells(promStartingPos);
+  cells.forEach(i => {
+    if (i !== promStartingPos) {
+      const cellElement = document.querySelector(`input[data-idx='${i}']`).parentElement;
+      cellElement.classList.add('selected');
+    }
+  });
 }
 
 
