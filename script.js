@@ -415,7 +415,7 @@ function highlightPromposal() {
   document.querySelectorAll('#across-list li, #down-list li')
     .forEach(li => li.classList.remove('active', 'highlighted'));
 
-  const promCell = document.querySelector(`input[data-idx='${promStartingPos}']`).parentCell;
+  const promCell = document.querySelector(`input[data-idx='${promStartingPos}']`).parentElement;
   promCell.classList.add('selected');
 
   // Highlight all cells in prom
