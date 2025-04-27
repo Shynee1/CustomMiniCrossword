@@ -1,0 +1,25 @@
+{
+    "rows": 5,
+    "cols": 5,
+    "grid": [
+      {"black": true}, {"black": false}, {"black": false}, {"black": false}, {"black": false},
+      {"black": false}, {"black": false}, {"black": false}, {"black": false}, {"black": false},
+      {"black": false}, {"black": false}, {"black": false}, {"black": false}, {"black": false},
+      {"black": false}, {"black": false}, {"black": false}, {"black": false}, {"black": false},
+      {"black": false}, {"black": false}, {"black": false}, {"black": false}, {"black": false}
+    ],
+    "across": [
+      {"num": 1, "row": 0, "col": 0, "clue": "Your response to a funny message", "answer": "HELP"},
+      {"num": 2, "row": 1, "col": 0, "clue": "Player for a team we watched lose (ft. Dr Putter)", "answer": "SIXER"},
+      {"num": 3, "row": 2, "col": 0, "clue": "Synonym for: 'Yes Paige, you're absolutely right'", "answer": "DITTO"},
+      {"num": 4, "row": 3, "col": 0, "clue": "My mom's favorite AIS club", "answer": "FORUM"},
+      {"num": 5, "row": 4, "col": 0, "clue": "Unsure answer to the question 'where should we eat?'", "answer": "SNAP?"}
+    ],
+    "down": [
+      {"num": 1, "row": 0, "col": 0, "clue": "3D graphics method for sampling distance (abbr.)", "answer": "SDFS"},
+      {"num": 2, "row": 0, "col": 1, "clue": "Friendly greeting said to a charged particle", "answer": "HIION"},
+      {"num": 3, "row": 0, "col": 2, "clue": "'Ugh my friends are being so ______!'", "answer": "EXTRA"},
+      {"num": 4, "row": 0, "col": 3, "clue": "What I wish you would do with the tickling", "answer": "LETUP"},
+      {"num": 5, "row": 0, "col": 4, "clue": "Answer the other questions", "answer": "PROM?"}
+    ]
+  }

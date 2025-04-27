@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Mini Crossword</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="minicrossword">
+    <nav class="topbar">
+      <button class="menu-btn">☰</button>
+      <img src="nyt-logo.svg" alt="NYT Logo" class="nyt-logo">
+      <span class="section">Games</span>
+    </nav>
+    <header class="titlebar">
+      <div class="title-wrap">
+        <h1>The Mini Crossword</h1>
+        <span class="date" id="date">Sunday, March 17, 2024</span>
+      </div>
+      <div class="byline">By Jack Ford</div>
+    </header>
+    <div class="toolbar">
+      <button id="settings"><img src="settings-gear.svg" alt="Settings"></button>
+      <div id="timer">0:00 <span class="pause">❚❚</span></div>
+      <button id="rebus">Rebus</button>
+      <button id="clear">Clear</button>
+      <button id="reveal">Reveal</button>
+      <button id="check">Check</button>
+      <button id="toggle-dir"><img src="pencil-blue.svg" alt="Toggle Direction"></button>
+    </div>
+    <main>
+      <div id="grid"></div>
+      <div id="clues">
+        <div class="clues-container">
+          <div class="clue-section">
+            <h2>ACROSS</h2>
+            <ul id="across-list"></ul>
+            <div class="scroll-button">▼</div>
+          </div>
+          <div class="clue-section">
+            <h2>DOWN</h2>
+            <ul id="down-list"></ul>
+            <div class="scroll-button">▼</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

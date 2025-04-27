@@ -1,0 +1,336 @@
+/* Reset & Base */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* Font face declaration for nyt-karnakcondensed */
+@font-face {
+  font-family: 'nyt-karnakcondensed';
+  src: url('https://static01.nyt.com/fonts/family/karnak/karnak-condensed-bold-900.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+}
+
+:root {
+  --horizontal-spacing-2: 16px;
+}
+
+body {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background: #f8f8f8;
+  color: #333;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+#minicrossword { 
+  width: 100%;
+  max-width: 1000px; 
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.topbar { 
+  display: flex; 
+  align-items: center; 
+  padding: 8px 16px;
+  border-bottom: 1px solid #e2e2e2;
+  background: #fff;
+}
+
+.menu-btn { 
+  font-size: 24px; 
+  background: none; 
+  border: none; 
+  cursor: pointer;
+  color: #333;
+  padding: 0 8px;
+}
+
+.nyt-logo { 
+  height: 24px; 
+  margin: 0 8px;
+}
+
+/* NYT "Games" section styling */
+.section { 
+  font-family: nyt-karnakcondensed, Georgia, serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-left: 4px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.titlebar { 
+  padding: 16px 24px; 
+  border-bottom: 1px solid #e2e2e2;
+}
+
+.title-wrap { 
+  display: flex; 
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+/* NYT "Mini Crossword" title styling */
+.title-wrap h1 { 
+  font-family: nyt-karnakcondensed, Georgia, serif;
+  font-size: 2.625rem; /* 42px */
+  line-height: 3.4125rem; /* 54.6px */
+  display: inline-block;
+  font-weight: 700;
+  margin-right: var(--horizontal-spacing-2);
+  letter-spacing: 0.5px;
+}
+
+.date { 
+  font-size: 16px; 
+  color: #666; 
+}
+
+.byline { 
+  margin-top: 4px; 
+  font-size: 13px; 
+  color: #666;
+}
+
+.toolbar { 
+  display: flex; 
+  align-items: center; 
+  padding: 8px 24px; 
+  border-bottom: 1px solid #e2e2e2;
+}
+
+.toolbar button { 
+  background: none; 
+  border: none; 
+  margin-right: 18px; 
+  cursor: pointer; 
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+#settings {
+  margin-right: 10px;
+}
+
+#settings img {
+  width: 20px;
+  height: 20px;
+}
+
+#timer { 
+  font-size: 14px; 
+  margin-right: auto;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+
+#timer .pause { 
+  font-size: 12px;
+  margin-left: 6px;
+  color: #666;
+}
+
+#toggle-dir {
+  margin-left: 10px;
+}
+
+#toggle-dir img {
+  width: 16px;
+  height: 16px;
+}
+
+main { 
+  display: flex;
+  flex-direction: row;
+  border-top: 1px solid #f2f2f2;
+}
+
+#grid {
+  display: grid;
+  grid-gap: 1px;
+  background: #000;
+  padding: 4px;
+  margin: 20px;
+  flex: 0 0 auto;
+}
+
+.cell {
+  position: relative;
+  width: 75px;
+  height: 75px;
+  background: #fff;
+}
+
+.cell.black { 
+  background: #000; 
+}
+
+.cell .number {
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  font-size: 12px;
+  color: #333;
+  font-weight: normal;
+}
+
+.cell input {
+  width: 100%; 
+  height: 100%;
+  border: none;
+  text-align: center;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 32px;
+  font-weight: bold;
+  text-transform: uppercase;
+  outline: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.cell.selected { 
+  background: #ffda00; 
+}
+
+.cell.active { 
+  background: #a7d8ff; 
+}
+
+#clues { 
+  flex: 1; 
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.clues-container {
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+}
+
+.clue-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.clue-section h2 { 
+  font-family: nyt-karnakcondensed, Georgia, serif;
+  font-size: 14px; 
+  margin-bottom: 12px; 
+  font-weight: 700;
+  color: #000;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+#across-list, #down-list { 
+  list-style: none;
+  overflow-y: auto;
+  margin-bottom: 8px;
+}
+
+#across-list li, #down-list li { 
+  font-size: 14px; 
+  padding: 8px 12px; 
+  cursor: pointer;
+  margin-bottom: 4px;
+  border-radius: 4px;
+}
+
+#across-list li.active, #down-list li.active { 
+  background: #a7d8ff; 
+}
+
+#across-list li.highlighted, #down-list li.highlighted {
+  background: #f2f2f2;
+}
+
+.scroll-button {
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
+  margin-top: 4px;
+}
+
+/* Victory screen styling */
+.victory-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.victory-message {
+  background-color: white;
+  padding: 40px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  max-width: 400px;
+}
+
+.victory-message h2 {
+  font-family: nyt-karnakcondensed, Georgia, serif;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 32px;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+}
+
+.victory-message p {
+  font-size: 18px;
+  margin-bottom: 30px;
+  color: #555;
+}
+
+.victory-message button {
+  padding: 10px 24px;
+  font-size: 16px;
+  background-color: #ffda00;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  main {
+    flex-direction: column;
+  }
+  #grid {
+    margin: 20px auto;
+  }
+  .clues-container {
+    flex-direction: column;
+  }
+  .cell {
+    width: 55px;
+    height: 55px;
+  }
+  .cell input {
+    font-size: 24px;
+  }
+  .title-wrap h1 {
+    font-size: 1.875rem; /* 30px for mobile */
+    line-height: 2.25rem; /* 36px for mobile */
+  }
+}
