@@ -2,6 +2,7 @@
     "author": "Jack Ford",
     "editor": "Joel Fagliano",
     "date": "Sunday, March 17th, 2024",
+    "highlight_prom_text": true,
     "rows": 5,
     "cols": 5,
     "grid": [

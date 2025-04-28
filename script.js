@@ -11,6 +11,7 @@ const dateOptions = {
 window.onload = async () => {
   try {
     puzzle = await (await fetch('puzzle.json')).json();
+    console.log(puzzle);
     buildGrid();
     buildClues();
     startTimer();
@@ -440,7 +441,8 @@ function showVictoryScreen() {
   overlay.appendChild(messageBox);
   document.body.appendChild(overlay);
 
-  highlightPromposal();
+  if (puzzle.highlight_prom_text)
+    highlightPromposal();
 }
 
 function highlightPromposal() {
