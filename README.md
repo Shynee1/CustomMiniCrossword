@@ -2,7 +2,7 @@
 
 A fully functional clone of the New York Times Mini Crossword puzzle application with customizable puzzles and a familiar interface. This project was originally created as a promposal for my girlfriend! The final answer in my custom puzzle spells out "PROM?"
 
-![NYT Mini Crossword Clone](https://github.com/yourusername/nyt-mini-crossword-clone/raw/main/screenshot.png)
+![NYT Mini Crossword Clone](https://github.com/Shynee1/CustomMiniCrossword/blob/main/assets/Crossword_UI.png)
 
 ## 🎮 Demo
 
