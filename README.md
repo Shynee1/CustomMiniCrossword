@@ -1,6 +1,6 @@
 # NYT Mini Crossword Clone
 
-A fully functional clone of the New York Times Mini Crossword puzzle application with customizable puzzles and a familiar interface. This project was originally created as a promposal for my girlfriend! The final answer in my custom puzzle spells out "PROM?"
+A semi-functional clone of the New York Times Mini Crossword website with customizable puzzles and a familiar interface. This project was originally created as a promposal for my girlfriend! The final answer in my custom puzzle spells out "PROM?"
 
 ![NYT Mini Crossword Clone](https://github.com/Shynee1/CustomMiniCrossword/blob/main/assets/Crossword_UI.png)
 
@@ -31,6 +31,9 @@ The puzzle data is stored in a JSON file with the following structure:
 
 ```json
 {
+  "author": "<Author name>"
+  "editor": "<Optional editor name>"
+  "date": "<Optional custom date>"
   "rows": 5,
   "cols": 5,
   "grid": [
@@ -46,6 +49,8 @@ The puzzle data is stored in a JSON file with the following structure:
   ]
 }
 ```
+
+**Note:** The "editor" and "date" fields are completely optional. Leaving the date field blank will default to the current date of the user accessing the site.
 
 ## 🚀 Getting Started
 
