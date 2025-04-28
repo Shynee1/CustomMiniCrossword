@@ -40,12 +40,58 @@ window.onload = async () => {
     document.getElementById('clear').addEventListener('click', () => console.log('Clear clicked'));
     document.getElementById('reveal').addEventListener('click', () => console.log('Reveal clicked'));
     document.getElementById('check').addEventListener('click', () => console.log('Check clicked'));
+    document.getElementById('pause').addEventListener('click', handlePause);
     
     document.addEventListener('keydown', handleKeydown);
   } catch (error) {
     console.error('Error loading puzzle:', error);
   }
 };
+
+function handlePause(e) {
+  // Toggle pause state
+  if (!timerInterval) {
+    // Timer is already paused, resume it
+    startTimer();
+    
+    // Remove the pause overlay if it exists
+    const existingOverlay = document.querySelector('.pause-overlay');
+    if (existingOverlay) {
+      document.body.removeChild(existingOverlay);
+    }
+  } else {
+    // Pause the timer
+    clearInterval(timerInterval);
+    timerInterval = null;
+    
+    // Create pause overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'popup-overlay';
+    
+    const messageBox = document.createElement('div');
+    messageBox.className = 'popup-message';
+    
+    const heading = document.createElement('h2');
+    heading.textContent = 'Timer Paused';
+    
+    const timeMsg = document.createElement('p');
+    const m = Math.floor(timerSecs / 60), s = String(timerSecs % 60).padStart(2, '0');
+    timeMsg.textContent = `Puzzle stopped at ${m}:${s}`;
+    
+    const continueBtn = document.createElement('button');
+    continueBtn.textContent = 'Continue';
+    continueBtn.addEventListener('click', () => {
+      document.body.removeChild(overlay);
+      startTimer();
+    });
+
+    messageBox.appendChild(heading);
+    messageBox.appendChild(timeMsg);
+    messageBox.appendChild(continueBtn);
+    overlay.appendChild(messageBox);
+    document.body.appendChild(overlay);
+  }
+}
 
 // Handle keyboard navigation
 function handleKeydown(e) {
@@ -370,10 +416,10 @@ function showVictoryScreen() {
   puzzleCompleted = true;
   
   const overlay = document.createElement('div');
-  overlay.className = 'victory-overlay';
+  overlay.className = 'popup-overlay';
   
   const messageBox = document.createElement('div');
-  messageBox.className = 'victory-message';
+  messageBox.className = 'popup-message';
   
   const heading = document.createElement('h2');
   heading.textContent = 'Congratulations!';
