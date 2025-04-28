@@ -1,10 +1,9 @@
 /* Reset & Base */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* Font face declaration for nyt-karnakcondensed */
 @font-face {
   font-family: 'nyt-karnakcondensed';
-  src: url('https://static01.nyt.com/fonts/family/karnak/karnak-condensed-bold-900.woff2') format('woff2');
+  src: url('fonts/NYTKarnakCondensed.woff2');
   font-weight: 700;
   font-style: normal;
 }
@@ -16,7 +15,7 @@
 body {
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   background: #f8f8f8;
-  color: #333;
+  color: #000;
   display: flex;
   justify-content: center;
   padding: 20px;
@@ -58,7 +57,6 @@ body {
   font-weight: 700;
   margin-left: 4px;
   letter-spacing: 0.5px;
-  text-transform: uppercase;
 }
 
 .titlebar { 
@@ -85,13 +83,13 @@ body {
 
 .date { 
   font-size: 16px; 
-  color: #666; 
+  color: #000; 
 }
 
 .byline { 
   margin-top: 4px; 
   font-size: 13px; 
-  color: #666;
+  color: #000;
 }
 
 .toolbar { 

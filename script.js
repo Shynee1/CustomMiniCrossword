@@ -23,8 +23,18 @@ window.onload = async () => {
     });
 
     const now = new Date();
-    const dateString = now.toLocaleDateString('en-US', dateOptions);
-    //document.getElementById('date').textContent = dateString;
+    let dateString = now.toLocaleDateString('en-US', dateOptions);
+    if (puzzle.date && puzzle.date !== ""){
+      dateString = puzzle.date;
+    }
+
+    document.getElementById('date').textContent = dateString;
+
+    let authorString = `By ${puzzle.author}`;
+    if (puzzle.editor && puzzle.editor !== "")
+      authorString += ` ● Edited by ${puzzle.editor}`
+
+    document.getElementById('creator').textContent = authorString;
     
     document.getElementById('rebus').addEventListener('click', () => console.log('Rebus clicked'));
     document.getElementById('clear').addEventListener('click', () => console.log('Clear clicked'));
@@ -60,7 +70,6 @@ function handleKeydown(e) {
     }
 }
 
-// Function to move to the next clue
 function moveToNextClue() {
     // Find the current clue index
     let currentClueIndex = -1;
@@ -69,7 +78,7 @@ function moveToNextClue() {
     for (let i = 0; i < puzzle[activeDir].length; i++) {
       const clue = puzzle[activeDir][i];
       const clueIdx = clue.row * puzzle.cols + clue.col;
-      const clueCells = getEntryCells(clueIdx);SVGAElement
+      const clueCells = getEntryCells(clueIdx);
     
       if (clueCells.includes(activeIdx)) {
         currentClueIndex = i;
@@ -280,21 +289,6 @@ function highlightFrom(idx) {
         
         // Scroll the clue into view if needed
         clueElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-    }
-  });
-  
-  // Highlight the other direction's clue as "highlighted"
-  const otherDir = activeDir === 'across' ? 'down' : 'across';
-  puzzle[otherDir].forEach(clue => {
-    let clueIdx = clue.row * puzzle.cols + clue.col;
-    let clueCells = getEntryCells(clueIdx);
-    
-    if (clueCells.includes(idx)) {
-      // This intersects with our active cell
-      const clueElement = document.querySelector(`#${otherDir}-list li[data-num='${clue.num}']`);
-      if (clueElement) {
-        clueElement.classList.add('highlighted');
       }
     }
   });
