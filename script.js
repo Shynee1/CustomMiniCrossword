@@ -74,6 +74,8 @@ function buildAnswerGrid() {
 function findPositionForClue(direction, index) {
   const clue = puzzle[direction][index];
   const clueNum = getClueNumberFromIndex(direction, index);
+  if (clueNum === null)
+      return { row: -1, col: -1 };
   
   for (let r = 0; r < puzzle.rows; r++) {
     for (let c = 0; c < puzzle.cols; c++) {
@@ -84,7 +86,7 @@ function findPositionForClue(direction, index) {
     }
   }
   
-  return { row: 0, col: 0 };
+  return { row: -1, col: -1 };
 }
 
 function getClueNumberFromIndex(direction, index) {
@@ -255,7 +257,6 @@ function moveToNextClue() {
 
 function moveToPreviousClue() {
   let currentClueIndex = -1;
-  let currentClueLength = -1;
   const entriesInCurrentDirection = puzzle[activeDir];
 
   // Find the active clue in the current direction
@@ -266,30 +267,36 @@ function moveToPreviousClue() {
 
     if (clueCells.includes(activeIdx)){
       currentClueIndex = i;
-      currentClueLength = clueCells.length;
       break;
     }
   }
 
-  if (currentClueIndex !== -1) {
-    const prevClueIndex = (currentClueIndex - 1) % entriesInCurrentDirection.length;
-    const prevCluePosition = findPositionForClue(activeDir, prevClueIndex);
-    const prevClueStartIdx = rcToIdx(prevCluePosition.row, prevCluePosition.col);
-    const prevClueLength = getEntryCells(prevClueStartIdx).length;
+  if (currentClueIndex === -1) return;
 
-    if (activeDir === 'across'){
-      prevCluePosition.col += prevClueLength - 1;
-    }
-    else {
-      prevCluePosition.row += prevClueLength - 1;
-    }
+  let prevClueIndex = (currentClueIndex - 1) % entriesInCurrentDirection.length;
 
-    const prevClueEndIdx = rcToIdx(prevCluePosition.row, prevCluePosition.col);
+  if (prevClueIndex === -1)
+      prevClueIndex = entriesInCurrentDirection.length - 1;
 
-    activeIdx = prevClueEndIdx;
-    highlightFrom(prevClueEndIdx);
-    document.querySelector(`input[data-idx='${prevClueEndIdx}']`).focus();
+  const prevCluePosition = findPositionForClue(activeDir, prevClueIndex);
+
+  if (prevCluePosition.row === -1) return;
+
+  const prevClueStartIdx = rcToIdx(prevCluePosition.row, prevCluePosition.col);
+  const prevClueLength = getEntryCells(prevClueStartIdx).length;
+
+  if (activeDir === 'across'){
+    prevCluePosition.col += prevClueLength - 1;
   }
+  else {
+    prevCluePosition.row += prevClueLength - 1;
+  }
+
+  const prevClueEndIdx = rcToIdx(prevCluePosition.row, prevCluePosition.col);
+
+  activeIdx = prevClueEndIdx;
+  highlightFrom(prevClueEndIdx);
+  document.querySelector(`input[data-idx='${prevClueEndIdx}']`).focus();
 }
   
 function moveInDirection(dr, dc) {
