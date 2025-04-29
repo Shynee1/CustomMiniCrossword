@@ -226,10 +226,9 @@ function handleKeydown(e) {
 
 function moveToNextClue() {
     let currentClueIndex = -1;
-    
-    // Find the active clue in the current direction
     const entriesInCurrentDirection = puzzle[activeDir];
-    
+
+    // Find the active clue in the current direction
     for (let i = 0; i < entriesInCurrentDirection.length; i++) {
       const position = findPositionForClue(activeDir, i);
       const clueIdx = position.row * puzzle.cols + position.col;
@@ -252,6 +251,45 @@ function moveToNextClue() {
       highlightFrom(nextClueIdx);
       document.querySelector(`input[data-idx='${nextClueIdx}']`).focus();
     }
+}
+
+function moveToPreviousClue() {
+  let currentClueIndex = -1;
+  let currentClueLength = -1;
+  const entriesInCurrentDirection = puzzle[activeDir];
+
+  // Find the active clue in the current direction
+  for (let i = 0; i < entriesInCurrentDirection.length; i++){
+    const position = findPositionForClue(activeDir, i);
+    const clueIdx = position.row * puzzle.cols + position.col;
+    const clueCells = getEntryCells(clueIdx);
+
+    if (clueCells.includes(activeIdx)){
+      currentClueIndex = i;
+      currentClueLength = clueCells.length;
+      break;
+    }
+  }
+
+  if (currentClueIndex !== -1) {
+    const prevClueIndex = (currentClueIndex - 1) % entriesInCurrentDirection.length;
+    const prevCluePosition = findPositionForClue(activeDir, prevClueIndex);
+    const prevClueStartIdx = rcToIdx(prevCluePosition.row, prevCluePosition.col);
+    const prevClueLength = getEntryCells(prevClueStartIdx).length;
+
+    if (activeDir === 'across'){
+      prevCluePosition.col += prevClueLength - 1;
+    }
+    else {
+      prevCluePosition.row += prevClueLength - 1;
+    }
+
+    const prevClueEndIdx = rcToIdx(prevCluePosition.row, prevCluePosition.col);
+
+    activeIdx = prevClueEndIdx;
+    highlightFrom(prevClueEndIdx);
+    document.querySelector(`input[data-idx='${prevClueEndIdx}']`).focus();
+  }
 }
   
 function moveInDirection(dr, dc) {
@@ -296,27 +334,7 @@ function buildPuzzleGrid() {
         inp.dataset.idx = idx;
         
         inp.addEventListener('input', onInput);
-        
-        // Handle backspace properly
-        inp.addEventListener('keydown', e => {
-          if (e.key === 'Backspace') {
-            if (e.target.value && !e.target.classList.contains('correct')) {
-              e.target.value = '';
-              e.preventDefault();
-            } else {
-              e.preventDefault();
-              const cells = getEntryCells(activeIdx);
-              const currentIdx = +e.target.dataset.idx;
-              const pos = cells.indexOf(currentIdx);
-              
-              if (pos > 0) {
-                const prevIdx = cells[pos - 1];
-                document.querySelector(`input[data-idx='${prevIdx}']`).focus();
-                highlightFrom(prevIdx);
-              }
-            }
-          }
-        });
+        inp.addEventListener('keydown', handleBackspace);
         
         cell.addEventListener('click', () => onCellClick(idx));
         cell.appendChild(inp);
@@ -335,18 +353,30 @@ function buildPuzzleGrid() {
   }
 }
 
+function handleBackspace(e) {
+  if (e.key !== "Backspace") return;
+
+  if (e.target.value && !e.target.classList.contains('correct')) {
+    e.target.value = '';
+  } 
+  else {
+    moveCursor(-1);
+    e.preventDefault();
+  }
+}
+
 function onInput(e) {
   // Only move forward if a character was actually entered
-  if (e.target.value) {
-    if (e.target.classList.contains('incorrect'))
-      e.target.classList.remove('incorrect');
+  if (!e.target.value) return;
+
+  if (e.target.classList.contains('incorrect'))
+    e.target.classList.remove('incorrect');
     
-    e.target.value = e.target.value.toUpperCase();
-    moveCursor(1);
-    
-    // Check if puzzle is complete after input
-    setTimeout(checkPuzzleCompletion, 300);
-  }
+  e.target.value = e.target.value.toUpperCase();
+  moveCursor(1);
+
+  // Check if puzzle is complete after input
+  setTimeout(checkPuzzleCompletion, 300);
 }
 
 function buildClues() {
@@ -390,17 +420,20 @@ function onCellClick(idx) {
 
 function moveCursor(delta) {
   if (activeIdx === null) return;
+
   const cells = getEntryCells(activeIdx);
-  const activeInput = document.activeElement;
-  const currentIdx = +activeInput.dataset.idx;
-  const pos = cells.indexOf(currentIdx);
+  const pos = cells.indexOf(activeIdx);
   const newPos = pos + delta;
+
   if (newPos >= 0 && newPos < cells.length) {
-    const nextIdx = cells[newPos];
-    document.querySelector(`input[data-idx='${nextIdx}']`).focus();
-    highlightFrom(nextIdx);
+    const newCell = cells[newPos];
+    document.querySelector(`input[data-idx='${newCell}']`).focus();
+    highlightFrom(newCell);
   } else if (delta > 0 && newPos >= cells.length) {
     moveToNextClue();
+  }
+  else if (delta < 0 && newPos < 0) {
+    moveToPreviousClue();
   }
 }
 
