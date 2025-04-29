@@ -200,6 +200,14 @@ main {
   cursor: pointer;
 }
 
+.cell input.correct {
+  color: #2860d8;
+}
+
+.cell input.incorrect {
+  color: #eb4034;
+}
+
 .cell.selected { 
   background: #ffda00; 
 }

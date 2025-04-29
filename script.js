@@ -1,6 +1,7 @@
 let puzzle, activeDir = 'across', activeIdx = null, timerSecs = 0;
 let timerInterval;
 let puzzleCompleted = false;
+let answerGrid = [];
 const dateOptions = {
     weekday: 'long',
     year: 'numeric',
@@ -12,7 +13,9 @@ window.onload = async () => {
   try {
     puzzle = await (await fetch('puzzle.json')).json();
     console.log(puzzle);
-    buildGrid();
+    
+    buildAnswerGrid();
+    buildPuzzleGrid();
     buildClues();
     startTimer();
     
@@ -38,9 +41,9 @@ window.onload = async () => {
     document.getElementById('creator').textContent = authorString;
     
     document.getElementById('rebus').addEventListener('click', () => console.log('Rebus clicked'));
-    document.getElementById('clear').addEventListener('click', () => console.log('Clear clicked'));
-    document.getElementById('reveal').addEventListener('click', () => console.log('Reveal clicked'));
-    document.getElementById('check').addEventListener('click', () => console.log('Check clicked'));
+    document.getElementById('clear').addEventListener('click', clearPuzzle);
+    document.getElementById('reveal').addEventListener('click', revealSquare);
+    document.getElementById('check').addEventListener('click', checkSquare);
     document.getElementById('pause').addEventListener('click', handlePause);
     
     document.addEventListener('keydown', handleKeydown);
@@ -49,13 +52,119 @@ window.onload = async () => {
   }
 };
 
+function buildAnswerGrid() {
+  answerGrid = Array(puzzle.rows).fill().map(() => Array(puzzle.cols).fill(''));
+
+  for (let row = 0; row < puzzle.rows; row++){
+    let rowStringIdx = 0;
+    for (let col = 0; col < puzzle.cols; col++) {
+
+      if (isBlackCell(row, col)) continue;
+
+      const entry = puzzle.across[row];
+
+      if (rowStringIdx >= entry.answer.length) continue;
+
+      answerGrid[row][col] = entry.answer.charAt(rowStringIdx);
+      rowStringIdx++;
+    }
+  }
+}
+
+function findPositionForClue(direction, index) {
+  const clue = puzzle[direction][index];
+  const clueNum = getClueNumberFromIndex(direction, index);
+  
+  for (let r = 0; r < puzzle.rows; r++) {
+    for (let c = 0; c < puzzle.cols; c++) {
+      const num = getClueNumber(r, c);
+      if (num === clueNum) {
+        return { row: r, col: c };
+      }
+    }
+  }
+  
+  return { row: 0, col: 0 };
+}
+
+function getClueNumberFromIndex(direction, index) {
+  let acrossCount = 0;
+  let downCount = 0;
+  let clueNumbers = [];
+  
+  for (let r = 0; r < puzzle.rows; r++) {
+    for (let c = 0; c < puzzle.cols; c++) {
+      if (isBlackCell(r, c)) continue;
+
+      const startAcross = c === 0 || isBlackCell(r, c-1);
+      const startDown = r === 0 || isBlackCell(r-1, c);
+      
+      if (startAcross || startDown) {
+        const clueNumber = clueNumbers.length + 1;
+        clueNumbers.push(clueNumber);
+        
+        if (startAcross) acrossCount++;
+        if (startDown) downCount++;
+        
+        if (direction === 'across' && startAcross && acrossCount === index + 1) {
+          return clueNumber;
+        }
+        
+        if (direction === 'down' && startDown && downCount === index + 1) {
+          return clueNumber;
+        }
+      }
+    }
+  }
+  
+  return null;
+}
+
+function clearPuzzle(e) {
+  clearHighlighting();
+
+  document.querySelectorAll('input')
+    .forEach(c => c.value = "");
+}
+
+function checkSquare(e) {
+  const input = document.querySelector(`input[data-idx='${activeIdx}']`);
+  const {r, c} = idxToRC(activeIdx);
+  const expected = answerGrid[r][c];
+  
+  if (input.value && input.value === expected)
+    input.classList.add('correct');
+  else 
+    input.classList.add('incorrect');
+}
+
+function revealSquare(e) {
+  const input = document.querySelector(`input[data-idx='${activeIdx}']`);
+  const {r, c} = idxToRC(activeIdx);
+  const answer = answerGrid[r][c];
+
+  if (input.classList.contains('incorrect'))
+      input.classList.remove('incorrect');
+
+  input.value = answer;
+  input.classList.add('correct');
+
+  setTimeout(checkPuzzleCompletion, 300);
+}
+
+function clearHighlighting(e) {
+  document.querySelectorAll('.cell.selected, .cell.active')
+    .forEach(c => c.classList.remove('selected','active'));
+  
+  document.querySelectorAll('#across-list li, #down-list li')
+    .forEach(li => li.classList.remove('active', 'highlighted'));
+}
+
 function handlePause(e) {
-  // Toggle pause state
   if (!timerInterval) {
-    // Timer is already paused, resume it
+    // Restart timer
     startTimer();
-    
-    // Remove the pause overlay if it exists
+  
     const existingOverlay = document.querySelector('.pause-overlay');
     if (existingOverlay) {
       document.body.removeChild(existingOverlay);
@@ -94,11 +203,9 @@ function handlePause(e) {
   }
 }
 
-// Handle keyboard navigation
 function handleKeydown(e) {
     if (!activeIdx) return;
-    
-    // Arrow keys for navigation
+  
     if (e.key === 'ArrowRight') {
       e.preventDefault();
       moveInDirection(0, 1);
@@ -118,13 +225,14 @@ function handleKeydown(e) {
 }
 
 function moveToNextClue() {
-    // Find the current clue index
     let currentClueIndex = -1;
-
+    
     // Find the active clue in the current direction
-    for (let i = 0; i < puzzle[activeDir].length; i++) {
-      const clue = puzzle[activeDir][i];
-      const clueIdx = clue.row * puzzle.cols + clue.col;
+    const entriesInCurrentDirection = puzzle[activeDir];
+    
+    for (let i = 0; i < entriesInCurrentDirection.length; i++) {
+      const position = findPositionForClue(activeDir, i);
+      const clueIdx = position.row * puzzle.cols + position.col;
       const clueCells = getEntryCells(clueIdx);
     
       if (clueCells.includes(activeIdx)) {
@@ -135,9 +243,9 @@ function moveToNextClue() {
 
     if (currentClueIndex !== -1) {
       // Move to the next clue in the current direction
-      const nextClueIndex = (currentClueIndex + 1) % puzzle[activeDir].length;
-      const nextClue = puzzle[activeDir][nextClueIndex];
-      const nextClueIdx = nextClue.row * puzzle.cols + nextClue.col;
+      const nextClueIndex = (currentClueIndex + 1) % entriesInCurrentDirection.length;
+      const nextPosition = findPositionForClue(activeDir, nextClueIndex);
+      const nextClueIdx = nextPosition.row * puzzle.cols + nextPosition.col;
     
       // Highlight the new clue and focus on its first cell
       activeIdx = nextClueIdx;
@@ -162,19 +270,20 @@ function moveInDirection(dr, dc) {
   }
 }
 
-function buildGrid() {
+function buildPuzzleGrid() {
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
   grid.style.gridTemplateColumns = `repeat(${puzzle.cols},1fr)`;
 
   for (let r = 0; r < puzzle.rows; r++) {
     for (let c = 0; c < puzzle.cols; c++) {
-      const idx = r * puzzle.cols + c;
+      const idx = rcToIdx(r, c);
       const cell = document.createElement('div');
       cell.className = 'cell';
-      if (puzzle.grid[idx].black) cell.classList.add('black');
-
-      if (!puzzle.grid[idx].black) {
+      if (puzzle.grid[idx].black){
+        cell.classList.add('black');
+      } 
+      else {
         const num = getClueNumber(r, c);
         if (num) {
           const n = document.createElement('div');
@@ -186,14 +295,12 @@ function buildGrid() {
         inp.maxLength = 1;
         inp.dataset.idx = idx;
         
-        // Typing moves cursor - only when a character is entered
         inp.addEventListener('input', onInput);
         
         // Handle backspace properly
         inp.addEventListener('keydown', e => {
           if (e.key === 'Backspace') {
-            if (e.target.value) {
-              // If there's text, just clear the cell without moving
+            if (e.target.value && !e.target.classList.contains('correct')) {
               e.target.value = '';
               e.preventDefault();
             } else {
@@ -211,7 +318,6 @@ function buildGrid() {
           }
         });
         
-        // Click selects cell
         cell.addEventListener('click', () => onCellClick(idx));
         cell.appendChild(inp);
       }
@@ -221,8 +327,8 @@ function buildGrid() {
   
   // Initialize the first active cell
   if (puzzle.across.length > 0) {
-    const firstClue = puzzle.across[0];
-    const firstIdx = firstClue.row * puzzle.cols + firstClue.col;
+    const firstPosition = findPositionForClue('across', 0);
+    const firstIdx = firstPosition.row * puzzle.cols + firstPosition.col;
     setTimeout(() => {
       highlightFrom(firstIdx);
     }, 100);
@@ -232,6 +338,9 @@ function buildGrid() {
 function onInput(e) {
   // Only move forward if a character was actually entered
   if (e.target.value) {
+    if (e.target.classList.contains('incorrect'))
+      e.target.classList.remove('incorrect');
+    
     e.target.value = e.target.value.toUpperCase();
     moveCursor(1);
     
@@ -244,16 +353,22 @@ function buildClues() {
   ['across','down'].forEach(dir => {
     const ul = document.getElementById(dir + '-list'); 
     ul.innerHTML = '';
-    puzzle[dir].forEach(cl => {
+    
+    puzzle[dir].forEach((clue, index) => {
+      const position = findPositionForClue(dir, index);
+      const clueNum = getClueNumberFromIndex(dir, index);
+      
       const li = document.createElement('li');
-      li.innerHTML = `<strong>${cl.num}.</strong> ${cl.clue}`;
+      li.innerHTML = `<strong>${clueNum}.</strong> ${clue.clue}`;
       li.dataset.dir = dir; 
-      li.dataset.num = cl.num;
-      li.dataset.idx = cl.row * puzzle.cols + cl.col;
+      li.dataset.num = clueNum;
+      li.dataset.idx = position.row * puzzle.cols + position.col;
+      
       li.addEventListener('click', () => {
         activeDir = dir;
-        highlightFrom(cl.row * puzzle.cols + cl.col);
+        highlightFrom(parseInt(li.dataset.idx));
       });
+      
       ul.appendChild(li);
     });
   });
@@ -269,12 +384,10 @@ function onCellClick(idx) {
   }
   
   highlightFrom(idx);
-  
-  // Always focus on the clicked cell input field
+
   document.querySelector(`input[data-idx='${idx}']`).focus();
 }
 
-// Update the moveCursor function to respect the active direction
 function moveCursor(delta) {
   if (activeIdx === null) return;
   const cells = getEntryCells(activeIdx);
@@ -289,17 +402,10 @@ function moveCursor(delta) {
   } else if (delta > 0 && newPos >= cells.length) {
     moveToNextClue();
   }
-  
 }
 
 function highlightFrom(idx) {
-  // Remove previous highlighting from cells
-  document.querySelectorAll('.cell.selected, .cell.active')
-    .forEach(c => c.classList.remove('selected','active'));
-  
-  // Remove active classes from clues
-  document.querySelectorAll('#across-list li, #down-list li')
-    .forEach(li => li.classList.remove('active', 'highlighted'));
+  clearHighlighting();
 
   // Highlight the selected cell
   const selCell = document.querySelector(`input[data-idx='${idx}']`).parentElement;
@@ -316,29 +422,27 @@ function highlightFrom(idx) {
   
   activeIdx = idx;
   
-  // Find the current clue and highlight it
-  const { r, c } = idxToRC(idx);
+  // Find the clue that contains this cell
+  const entries = puzzle[activeDir];
   
-  // Highlight the active clue
-  let foundClue = false;
-  
-  // First, find the specific clue that contains this cell
-  puzzle[activeDir].forEach(clue => {
-    let clueIdx = clue.row * puzzle.cols + clue.col;
-    let clueCells = getEntryCells(clueIdx);
+  for (let i = 0; i < entries.length; i++) {
+    const position = findPositionForClue(activeDir, i);
+    const clueIdx = position.row * puzzle.cols + position.col;
+    const clueCells = getEntryCells(clueIdx);
     
     if (clueCells.includes(idx)) {
       // This is our active clue
-      const clueElement = document.querySelector(`#${activeDir}-list li[data-num='${clue.num}']`);
+      const clueNum = getClueNumberFromIndex(activeDir, i);
+      const clueElement = document.querySelector(`#${activeDir}-list li[data-num='${clueNum}']`);
       if (clueElement) {
         clueElement.classList.add('active');
-        foundClue = true;
         
         // Scroll the clue into view if needed
         clueElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
+      break;
     }
-  });
+  }
 }
 
 function getEntryCells(startIdx) {
@@ -361,59 +465,69 @@ function getEntryCells(startIdx) {
 
 function isBlackCell(r, c) {
   if (r < 0 || c < 0 || r >= puzzle.rows || c >= puzzle.cols) return true;
-  const idx = r * puzzle.cols + c;
+  const idx = rcToIdx(r, c);
   return puzzle.grid[idx].black;
 }
 
-
-function getClueNumber(r,c) {
-  const a = puzzle.across.find(cl=>cl.row===r&&cl.col===c);
-  if (a) return a.num;
-  const d = puzzle.down.find(cl=>cl.row===r&&cl.col===c);
-  return d ? d.num : null;
+function getClueNumber(r, c) {
+  // We need to determine if this cell starts an across or down entry
+  if (isBlackCell(r, c)) return null;
+  
+  const startAcross = c === 0 || isBlackCell(r, c-1);
+  const startDown = r === 0 || isBlackCell(r-1, c);
+  
+  if (!startAcross && !startDown) return null;
+  
+  // Count all the clue numbers up to this point
+  let clueNumber = 1;
+  for (let rr = 0; rr < puzzle.rows; rr++) {
+    for (let cc = 0; cc < puzzle.cols; cc++) {
+      if (rr === r && cc === c) return clueNumber;
+      
+      if (!isBlackCell(rr, cc)) {
+        const sa = cc === 0 || isBlackCell(rr, cc-1);
+        const sd = rr === 0 || isBlackCell(rr-1, cc);
+        if (sa || sd) clueNumber++;
+      }
+    }
+  }
+  return null;
 }
 
 function startTimer() {
-    const el = document.getElementById('timer');
-    timerInterval = setInterval(() => {
-      if (!puzzleCompleted) {
-        timerSecs++;
-        const m = Math.floor(timerSecs / 60), s = String(timerSecs % 60).padStart(2, '0');
-        el.firstChild.textContent = `${m}:${s}`;
-      }
-    }, 1000);
-  }
+  const el = document.getElementById('timer');
+  timerInterval = setInterval(() => {
+    if (!puzzleCompleted) {
+      timerSecs++;
+      const m = Math.floor(timerSecs / 60), s = String(timerSecs % 60).padStart(2, '0');
+      el.firstChild.textContent = `${m}:${s}`;
+    }
+  }, 1000);
+}
 
-  function checkPuzzleCompletion() {
-    if (puzzleCompleted) return false;
-    
-    for (let r = 0; r < puzzle.rows; r++) {
-      let wordIndex = 0;
-      for (let c = 0; c < puzzle.cols; c++) {
-        const idx = r * puzzle.cols + c;
-        
-        // Skip black cells
-        if (puzzle.grid[idx].black) continue;
-        
-        // Get input element
-        const inputEl = document.querySelector(`input[data-idx='${idx}']`);
+function checkPuzzleCompletion() {
+  if (puzzleCompleted) return false;
+  
+  for (let r = 0; r < puzzle.rows; r++) {
+    for (let c = 0; c < puzzle.cols; c++) {
+  
+      if (isBlackCell(r, c)) continue;
 
-        let expectedValue = puzzle.across[r].answer.charAt(wordIndex);
-        wordIndex++;
-        
-        // Check if input exists and has a value
-        if (!inputEl || !inputEl.value || inputEl.value !== expectedValue || inputEl.value.trim() === '') {
-          return false; // Found an empty cell, puzzle not complete
-        }
+      const idx = rcToIdx(r, c);
+      const input = document.querySelector(`input[data-idx='${idx}']`);
+      const expectedValue = answerGrid[r][c];
+      
+      if (!input || input.value !== expectedValue) {
+        return false;
       }
     }
-    
-    showVictoryScreen();
-    return true;
   }
+  
+  showVictoryScreen();
+  return true;
+}
 
 function showVictoryScreen() {
-  // Set puzzle as completed to stop the timer
   puzzleCompleted = true;
   
   const overlay = document.createElement('div');
@@ -446,16 +560,10 @@ function showVictoryScreen() {
 }
 
 function highlightPromposal() {
-  const promStartingPos = 4;
+  let promStartingPos = 4;
+  
   activeDir = 'down';
-  
-  // Remove previous highlighting from cells
-  document.querySelectorAll('.cell.selected, .cell.active')
-    .forEach(c => c.classList.remove('selected','active'));
-  
-  // Remove active classes from clues
-  document.querySelectorAll('#across-list li, #down-list li')
-    .forEach(li => li.classList.remove('active', 'highlighted'));
+  clearHighlighting();
 
   const promCell = document.querySelector(`input[data-idx='${promStartingPos}']`).parentElement;
   promCell.classList.add('selected');
@@ -463,13 +571,14 @@ function highlightPromposal() {
   // Highlight all cells in prom
   const cells = getEntryCells(promStartingPos);
   cells.forEach(i => {
-    if (i !== promStartingPos) {
-      const cellElement = document.querySelector(`input[data-idx='${i}']`).parentElement;
-      cellElement.classList.add('selected');
-    }
+    const cellElement = document.querySelector(`input[data-idx='${i}']`).parentElement;
+    cellElement.classList.add('selected');
   });
 }
 
+function rcToIdx(r, c) {
+  return r * puzzle.cols + c;
+}
 
 function idxToRC(idx) {
   return { r: Math.floor(idx / puzzle.cols), c: idx % puzzle.cols };
