@@ -1,6 +1,6 @@
 # NYT Mini Crossword Clone
 
-A semi-functional clone of the New York Times Mini Crossword website with customizable puzzles and a familiar interface. This project was originally created as a promposal for my girlfriend! The final answer in my custom puzzle spells out "PROM?"
+A functional clone of the New York Times Mini Crossword website with customizable puzzles and a familiar interface. This project was originally created as a promposal for my girlfriend! The final answer in my custom puzzle spells out "PROM?"
 
 ![NYT Mini Crossword Clone](https://github.com/Shynee1/CustomMiniCrossword/blob/main/assets/Crossword_UI.png)
 
@@ -15,6 +15,7 @@ You can try the demo [here](https://nytcrossword.netlify.com)
 - **Interactive Grid**: Dynamic highlighting of active cells and clues
 - **Keyboard Navigation**: Full keyboard support with arrow keys for navigation
 - **Auto-advance Input**: The cursor automatically advances to the next cell when a letter is entered
+- **Interactive Buttons**: Reveal, check, or clear squares using the buttons on the top right. 
 - **Timer**: Tracks solving time with pause functionality
 - **Victory Screen**: Celebrates puzzle completion with time statistics
 
@@ -40,11 +41,11 @@ The puzzle data is stored in a JSON file with the following structure:
     {"black": true}, {"black": false}, ...
   ],
   "across": [
-    {"num": 1, "row": 0, "col": 0, "clue": "Your clue here", "answer": "ANSWER"},
+    {"clue": "Your clue here", "answer": "ANSWER"},
     ...
   ],
   "down": [
-    {"num": 1, "row": 0, "col": 0, "clue": "Your clue here", "answer": "ANSWER"},
+    {"clue": "Your clue here", "answer": "ANSWER"},
     ...
   ]
 }
