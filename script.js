@@ -275,6 +275,7 @@ function moveToPreviousClue() {
 
   let prevClueIndex = (currentClueIndex - 1) % entriesInCurrentDirection.length;
 
+  // Wrap around to last clue
   if (prevClueIndex === -1)
       prevClueIndex = entriesInCurrentDirection.length - 1;
 

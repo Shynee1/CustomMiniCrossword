@@ -20,10 +20,10 @@
       {"clue": "Unsure answer to the question 'where should we eat?'", "answer": "SNAP?"}
     ],
     "down": [
-      {"clue": "3D graphics method for sampling distance (abbr.)", "answer": "SDFS"},
       {"clue": "Friendly greeting said to a charged particle", "answer": "HIION"},
       {"clue": "'Ugh my friends are being so ______!'", "answer": "EXTRA"},
       {"clue": "What I wish you would do with the tickling", "answer": "LETUP"},
-      {"clue": "Answer the other questions", "answer": "PROM?"}
+      {"clue": "Answer the other questions", "answer": "PROM?"},
+      {"clue": "3D graphics method for sampling distance (abbr.)", "answer": "SDFS"}
     ]
   }
